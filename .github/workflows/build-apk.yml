@@ -2,17 +2,17 @@
 name: Build KhoaND10 FPT APK
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout source
         uses: actions/checkout@v4
 
       - name: Setup Java 17
@@ -21,30 +21,26 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      -       - name: Setup Android SDK
-        uses: android-actions/setup-android@v4
-        with:
-          accept-android-sdk-licenses: true
-          log-accepted-android-sdk-licenses: false
-          packages: ''
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses
 
-      - name: Setup Gradle
+      - name: Install Android SDK
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Setup Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
-      - name: Install Android SDK 35
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
       - name: Extract source ZIP
         run: unzip -q KhoaND10_FPT_Android_Source.zip -d extracted
 
-      - name: Build APK
+      - name: Build Android APK
         run: |
           cd extracted/KhoaND10_FPT_Android
           gradle assembleDebug
 
-      - name: Upload APK
+      - name: Save APK
         uses: actions/upload-artifact@v4
         with:
           name: KhoaND10-FPT-APK
