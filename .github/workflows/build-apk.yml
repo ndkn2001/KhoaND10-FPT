@@ -16,18 +16,22 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Accept Android licenses
-        run: yes | sdkmanager --licenses
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          accept-android-sdk-licenses: true
+          log-accepted-android-sdk-licenses: false
+          packages: ''
 
-      - name: Install Android SDK
+      - name: Install Android SDK 35
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Setup Gradle 8.9
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
@@ -35,12 +39,12 @@ jobs:
       - name: Extract source ZIP
         run: unzip -q KhoaND10_FPT_Android_Source.zip -d extracted
 
-      - name: Build Android APK
+      - name: Build APK
         run: |
           cd extracted/KhoaND10_FPT_Android
           gradle assembleDebug
 
-      - name: Save APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: KhoaND10-FPT-APK
